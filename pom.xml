@@ -4,10 +4,10 @@
 
 	<groupId>com.laamella.bitmask</groupId>
 	<artifactId>bitmask</artifactId>
-	<version>1.7-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<packaging>jar</packaging>
 	
-	<name>bitmask</name>
+	<name>Bitmask</name>
 	<description>2D pixel perfect collision detection library</description>
 	
 	<developers>
@@ -24,6 +24,7 @@
 			</roles>
 		</developer>
 	</developers>
+	
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>
