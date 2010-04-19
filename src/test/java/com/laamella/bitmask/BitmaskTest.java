@@ -1,5 +1,7 @@
 package com.laamella.bitmask;
 
+import java.io.IOException;
+
 import junit.framework.TestCase;
 import junitx.util.PrivateAccessor;
 
@@ -38,10 +40,6 @@ public class BitmaskTest extends TestCase {
 
 	public void testDataSize4() {
 		assertEquals(6, getBits(new Bitmask(128, 3)).length);
-	}
-
-	public void testToString() {
-		System.out.println(tenByTenBitmask);
 	}
 
 	public void testEmptyAfterConstruction() {
@@ -247,5 +245,37 @@ public class BitmaskTest extends TestCase {
 		}
 		final long end = System.currentTimeMillis();
 		System.out.println((end - start) / (double) times);
+	}
+
+	public void testScaleDown() {
+		final String pattern = BitmaskFactoryTest.readStringResource("/test_pattern.txt");
+		final String scaledPattern = BitmaskFactoryTest.readStringResource("/scaled_down_test_pattern.txt");
+		final Bitmask bitmask = BitmaskFactory.createBitmaskFromAsciiArt(pattern, 'o');
+		final Bitmask actual = bitmask.scale(10, 10);
+		assertEquals(scaledPattern, actual.toString());
+	}
+
+	public void testScaleEqual() {
+		final String pattern = BitmaskFactoryTest.readStringResource("/test_pattern.txt");
+		final Bitmask bitmask = BitmaskFactory.createBitmaskFromAsciiArt(pattern, 'o');
+		final Bitmask actual = bitmask.scale(bitmask.getWidth(), bitmask.getHeight());
+		assertEquals(pattern + "\n", actual.toString());
+	}
+
+	public void testScaleUp() {
+		final String pattern = BitmaskFactoryTest.readStringResource("/test_pattern.txt");
+		final String scaledPattern = BitmaskFactoryTest.readStringResource("/scaled_up_test_pattern.txt");
+		final Bitmask bitmask = BitmaskFactory.createBitmaskFromAsciiArt(pattern, 'o');
+		final Bitmask actual = bitmask.scale(100, 63);
+		assertEquals(scaledPattern, actual.toString());
+	}
+
+	public void testScaleTo0() {
+		final String pattern = BitmaskFactoryTest.readStringResource("/test_pattern.txt");
+		final Bitmask bitmask = BitmaskFactory.createBitmaskFromAsciiArt(pattern, 'o');
+		final Bitmask actual = bitmask.scale(0, 0);
+		assertEquals(1, actual.getWidth());
+		assertEquals(1, actual.getHeight());
+		assertFalse(actual.getBit(0, 0));
 	}
 }

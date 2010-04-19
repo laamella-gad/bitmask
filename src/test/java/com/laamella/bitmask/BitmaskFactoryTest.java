@@ -13,8 +13,13 @@ import org.apache.commons.io.FileUtils;
 
 public class BitmaskFactoryTest extends TestCase {
 
-	private String readStringResource(final String resourceName) throws IOException {
-		return FileUtils.readFileToString(new File(getClass().getResource(resourceName).getFile()));
+	public static String readStringResource(final String resourceName) {
+		try {
+			return FileUtils.readFileToString(new File(resourceName.getClass().getResource(resourceName).getFile()));
+		} catch (final IOException e) {
+			fail(e.getMessage());
+			return null;
+		}
 	}
 
 	public void testAlpha05() throws IOException {

@@ -94,4 +94,30 @@ public final class BitmaskFactory {
 		}
 		return bitmask;
 	}
+
+	/**
+	 * Create a bitmask with bits set for every character in the source string
+	 * that matches oneBitCharacter.
+	 * 
+	 * @param art
+	 *            a string containing lines of the bitmask, separated by EOLs.
+	 *            All lines should be of equal length.
+	 * @param oneBitCharacter
+	 *            the character that is interpreted as a set bit (a pixel that
+	 *            will collide.)
+	 * @return a new bitmask for the source image.
+	 */
+	public static Bitmask createBitmaskFromAsciiArt(final String art, final char oneBitCharacter) {
+		final String[] split = art.split("\n");
+		final Bitmask bitmask = new Bitmask(split[0].length(), split.length);
+		for (int y = 0; y < split.length; y++) {
+			final String line = split[y];
+			for (int x = 0; x < line.length(); x++) {
+				if (line.charAt(x) == oneBitCharacter) {
+					bitmask.setBit(x, y);
+				}
+			}
+		}
+		return bitmask;
+	}
 }
