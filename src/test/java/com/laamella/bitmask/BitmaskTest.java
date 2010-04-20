@@ -1,49 +1,28 @@
 package com.laamella.bitmask;
 
-import java.io.IOException;
-
 import junit.framework.TestCase;
-import junitx.util.PrivateAccessor;
 
 public class BitmaskTest extends TestCase {
 	private final Bitmask tenByTenBitmask = new Bitmask(10, 10);
 
-	private final long[] getBits(final Bitmask bitmask) {
-		try {
-			return (long[]) PrivateAccessor.getField(bitmask, "bits");
-		} catch (final NoSuchFieldException e) {
-			fail("For some reason, the bits field is inaccessible");
-			return null;
-		}
-	}
-
-	private final String dumpLongs(final Bitmask bitmask) {
-		final StringBuffer dump = new StringBuffer();
-		final long[] bits = getBits(bitmask);
-		for (int i = 0; i < bits.length; i++) {
-			dump.append(Long.toBinaryString(bits[i])).append("\n");
-		}
-		return dump.toString();
-	}
-
 	public void testDataSize1() {
-		assertEquals(10, getBits(tenByTenBitmask).length);
+		assertEquals(10, Tools.getBits(tenByTenBitmask).length);
 	}
 
 	public void testDataSize2() {
-		assertEquals(3, getBits(new Bitmask(64, 3)).length);
+		assertEquals(3, Tools.getBits(new Bitmask(64, 3)).length);
 	}
 
 	public void testDataSize3() {
-		assertEquals(6, getBits(new Bitmask(65, 3)).length);
+		assertEquals(6, Tools.getBits(new Bitmask(65, 3)).length);
 	}
 
 	public void testDataSize4() {
-		assertEquals(6, getBits(new Bitmask(128, 3)).length);
+		assertEquals(6, Tools.getBits(new Bitmask(128, 3)).length);
 	}
 
 	public void testEmptyAfterConstruction() {
-		assertEquals(0, tenByTenBitmask.count());
+		assertEquals(0, tenByTenBitmask.countBits());
 	}
 
 	public void testGetSetBit1() {
@@ -75,15 +54,15 @@ public class BitmaskTest extends TestCase {
 	public void testFill() {
 		final Bitmask bitMask = new Bitmask(200, 3);
 		bitMask.fill();
-		assertEquals(600, bitMask.count());
+		assertEquals(600, bitMask.countBits());
 	}
 
 	public void testInvert1() {
 		final Bitmask bitMask = new Bitmask(200, 3);
 		bitMask.invert();
-		assertEquals(600, bitMask.count());
+		assertEquals(600, bitMask.countBits());
 		bitMask.invert();
-		assertEquals(0, bitMask.count());
+		assertEquals(0, bitMask.countBits());
 	}
 
 	public void testInvert2() {
@@ -91,9 +70,9 @@ public class BitmaskTest extends TestCase {
 		bitMask.setBit(0, 2);
 		bitMask.setBit(199, 0);
 		bitMask.invert();
-		assertEquals(598, bitMask.count());
+		assertEquals(598, bitMask.countBits());
 		bitMask.invert();
-		assertEquals(2, bitMask.count());
+		assertEquals(2, bitMask.countBits());
 	}
 
 	public void testOverlap1() {
@@ -101,7 +80,7 @@ public class BitmaskTest extends TestCase {
 		bitMask1.setBit(0, 0);
 		final Bitmask bitMask2 = new Bitmask(1, 1);
 		bitMask2.setBit(0, 0);
-		assertTrue(bitMask1.overlap(bitMask2, 0, 0));
+		assertTrue(bitMask1.overlaps(bitMask2, 0, 0));
 	}
 
 	public void testOverlap2() {
@@ -109,7 +88,7 @@ public class BitmaskTest extends TestCase {
 		bitMask1.setBit(0, 0);
 		final Bitmask bitMask2 = new Bitmask(1, 1);
 		bitMask2.setBit(0, 0);
-		assertFalse(bitMask1.overlap(bitMask2, 1, 0));
+		assertFalse(bitMask1.overlaps(bitMask2, 1, 0));
 	}
 
 	public void testOverlap3() {
@@ -117,7 +96,7 @@ public class BitmaskTest extends TestCase {
 		bitMask1.setBit(0, 0);
 		final Bitmask bitMask2 = new Bitmask(1, 1);
 		bitMask2.setBit(0, 0);
-		assertFalse(bitMask1.overlap(bitMask2, -1, 0));
+		assertFalse(bitMask1.overlaps(bitMask2, -1, 0));
 	}
 
 	public void testOverlap4() {
@@ -125,7 +104,7 @@ public class BitmaskTest extends TestCase {
 		bitMask1.setBit(0, 0);
 		final Bitmask bitMask2 = new Bitmask(1, 1);
 		bitMask2.setBit(0, 0);
-		assertFalse(bitMask1.overlap(bitMask2, 0, 1));
+		assertFalse(bitMask1.overlaps(bitMask2, 0, 1));
 	}
 
 	public void testOverlap5() {
@@ -133,21 +112,21 @@ public class BitmaskTest extends TestCase {
 		bitMask1.setBit(0, 0);
 		final Bitmask bitMask2 = new Bitmask(1, 1);
 		bitMask2.setBit(0, 0);
-		assertFalse(bitMask1.overlap(bitMask2, 0, -1));
+		assertFalse(bitMask1.overlaps(bitMask2, 0, -1));
 	}
 
 	public void testOverlap6() {
 		final Bitmask bitMask1 = new Bitmask(1, 1);
 		bitMask1.setBit(0, 0);
 		final Bitmask bitMask2 = new Bitmask(1, 1);
-		assertFalse(bitMask1.overlap(bitMask2, 0, 0));
+		assertFalse(bitMask1.overlaps(bitMask2, 0, 0));
 	}
 
 	public void testOverlap7() {
 		final Bitmask bitMask1 = new Bitmask(1, 1);
 		final Bitmask bitMask2 = new Bitmask(1, 1);
 		bitMask2.setBit(0, 0);
-		assertFalse(bitMask1.overlap(bitMask2, 0, 0));
+		assertFalse(bitMask1.overlaps(bitMask2, 0, 0));
 	}
 
 	public void testOverlap8() {
@@ -159,7 +138,7 @@ public class BitmaskTest extends TestCase {
 		bitMask2.clearBit(2, 3);
 		bitMask2.clearBit(3, 2);
 		bitMask2.clearBit(3, 3);
-		assertFalse(bitMask1.overlap(bitMask2, -2, -2));
+		assertFalse(bitMask1.overlaps(bitMask2, -2, -2));
 	}
 
 	public void testOverlap9() {
@@ -171,7 +150,7 @@ public class BitmaskTest extends TestCase {
 		bitMask2.clearBit(2, 3);
 		bitMask2.clearBit(3, 2);
 		bitMask2.clearBit(3, 3);
-		assertTrue(bitMask1.overlap(bitMask2, -3, -2));
+		assertTrue(bitMask1.overlaps(bitMask2, -3, -2));
 	}
 
 	public void testOverlap10() {
@@ -183,99 +162,47 @@ public class BitmaskTest extends TestCase {
 		bitMask2.clearBit(2, 3);
 		bitMask2.clearBit(3, 2);
 		bitMask2.clearBit(3, 3);
-		assertFalse(bitMask2.overlap(bitMask1, -2, -2));
-	}
-
-	private final void makeOnOffPattern(final Bitmask bitMask) {
-		for (int x = 0; x < bitMask.getWidth(); x++) {
-			for (int y = 0; y < bitMask.getHeight(); y++) {
-				if ((x + y) % 2 == 1) {
-					bitMask.setBit(x, y);
-				}
-			}
-		}
+		assertFalse(bitMask2.overlaps(bitMask1, -2, -2));
 	}
 
 	public void testOverlap11() {
-		final Bitmask bitMask1 = new Bitmask(1000, 10);
-		final Bitmask bitMask2 = new Bitmask(1000, 10);
-		makeOnOffPattern(bitMask1);
-		makeOnOffPattern(bitMask2);
+		final Bitmask bitMask1 = Tools.makeOnOffPatternBitmask(1000, 10);
+		final Bitmask bitMask2 = Tools.makeOnOffPatternBitmask(1000, 10);
 		bitMask2.invert();
-		assertFalse(bitMask2.overlap(bitMask1, 0, 0));
+		assertFalse(bitMask2.overlaps(bitMask1, 0, 0));
 	}
 
 	public void testOverlap12() {
-		final Bitmask bitMask1 = new Bitmask(1000, 10);
-		final Bitmask bitMask2 = new Bitmask(1000, 10);
-		makeOnOffPattern(bitMask1);
-		makeOnOffPattern(bitMask2);
+		final Bitmask bitMask1 = Tools.makeOnOffPatternBitmask(1000, 10);
+		final Bitmask bitMask2 = Tools.makeOnOffPatternBitmask(1000, 10);
 		bitMask2.invert();
-		assertFalse(bitMask2.overlap(bitMask1, 1, 1));
+		assertFalse(bitMask2.overlaps(bitMask1, 1, 1));
 	}
 
 	public void testOverlap13() {
-		final Bitmask bitMask1 = new Bitmask(1000, 10);
-		final Bitmask bitMask2 = new Bitmask(1000, 10);
-		makeOnOffPattern(bitMask1);
-		makeOnOffPattern(bitMask2);
+		final Bitmask bitMask1 = Tools.makeOnOffPatternBitmask(1000, 10);
+		final Bitmask bitMask2 = Tools.makeOnOffPatternBitmask(1000, 10);
 		bitMask2.invert();
-		assertFalse(bitMask2.overlap(bitMask1, 1, -1));
+		assertFalse(bitMask2.overlaps(bitMask1, 1, -1));
 	}
 
 	public void testOverlap14() {
-		final Bitmask bitMask1 = new Bitmask(1000, 10);
-		final Bitmask bitMask2 = new Bitmask(1000, 10);
-		makeOnOffPattern(bitMask1);
-		makeOnOffPattern(bitMask2);
+		final Bitmask bitMask1 = Tools.makeOnOffPatternBitmask(1000, 10);
+		final Bitmask bitMask2 = Tools.makeOnOffPatternBitmask(1000, 10);
 		bitMask2.invert();
-		assertTrue(bitMask2.overlap(bitMask1, 1, 0));
+		assertTrue(bitMask2.overlaps(bitMask1, 1, 0));
 	}
 
 	public void sillyBenchmark() {
-		final Bitmask bitMask1 = new Bitmask(100, 100);
-		final Bitmask bitMask2 = new Bitmask(100, 100);
-		makeOnOffPattern(bitMask1);
-		makeOnOffPattern(bitMask2);
+		final Bitmask bitMask1 = Tools.makeOnOffPatternBitmask(100, 100);
+		final Bitmask bitMask2 = Tools.makeOnOffPatternBitmask(100, 100);
 		bitMask2.invert();
 		final long start = System.currentTimeMillis();
 		final int times = 1000000;
 		for (int time = 0; time < times; time++) {
-			bitMask1.overlap(bitMask2, 0, 0);
+			bitMask1.overlaps(bitMask2, 0, 0);
 		}
 		final long end = System.currentTimeMillis();
 		System.out.println((end - start) / (double) times);
-	}
-
-	public void testScaleDown() {
-		final String pattern = BitmaskFactoryTest.readStringResource("/test_pattern.txt");
-		final String scaledPattern = BitmaskFactoryTest.readStringResource("/scaled_down_test_pattern.txt");
-		final Bitmask bitmask = BitmaskFactory.createBitmaskFromAsciiArt(pattern, 'o');
-		final Bitmask actual = bitmask.scale(10, 10);
-		assertEquals(scaledPattern, actual.toString());
-	}
-
-	public void testScaleEqual() {
-		final String pattern = BitmaskFactoryTest.readStringResource("/test_pattern.txt");
-		final Bitmask bitmask = BitmaskFactory.createBitmaskFromAsciiArt(pattern, 'o');
-		final Bitmask actual = bitmask.scale(bitmask.getWidth(), bitmask.getHeight());
-		assertEquals(pattern + "\n", actual.toString());
-	}
-
-	public void testScaleUp() {
-		final String pattern = BitmaskFactoryTest.readStringResource("/test_pattern.txt");
-		final String scaledPattern = BitmaskFactoryTest.readStringResource("/scaled_up_test_pattern.txt");
-		final Bitmask bitmask = BitmaskFactory.createBitmaskFromAsciiArt(pattern, 'o');
-		final Bitmask actual = bitmask.scale(100, 63);
-		assertEquals(scaledPattern, actual.toString());
-	}
-
-	public void testScaleTo0() {
-		final String pattern = BitmaskFactoryTest.readStringResource("/test_pattern.txt");
-		final Bitmask bitmask = BitmaskFactory.createBitmaskFromAsciiArt(pattern, 'o');
-		final Bitmask actual = bitmask.scale(0, 0);
-		assertEquals(1, actual.getWidth());
-		assertEquals(1, actual.getHeight());
-		assertFalse(actual.getBit(0, 0));
 	}
 }

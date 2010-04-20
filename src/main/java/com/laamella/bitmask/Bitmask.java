@@ -31,14 +31,11 @@ import java.util.Arrays;
  * 2d collision detection. Set 'unoccupied' area to zero and occupies areas to
  * one and use the overlap*() functions to check for collisions.
  * <p/>
+ * All methods come in two variants: one with a separate x and y parameter, and
+ * one with a Point2d, which is the superclass of all Java Point classes. The
+ * Point2d version always calls the x and y version of the method.
+ * <p/>
  * For various ways to create bitmasks, see {@link BitmaskFactory}.
- * <p/>
- * Note that for now, only one collision detection method has been ported, but
- * this happens to be the most essential one.
- * <p/>
- * Technical background: <a
- * href="http://imrtechnology.ngemu.com/downloads/tutorial.pdf"> A 2d collision
- * detection tutorial, including a C implementation.</a>
  */
 public final class Bitmask implements Serializable {
 	private static final long BITMASK_W_LEN = Long.SIZE;
@@ -69,25 +66,31 @@ public final class Bitmask implements Serializable {
 		clear();
 	}
 
-	public final Dimension2D getSize() {
+	public Bitmask(final Bitmask bitmask) {
+		this.w = bitmask.w;
+		this.h = bitmask.h;
+		this.bits = Arrays.copyOf(bitmask.bits, bitmask.bits.length);
+	}
+
+	public Dimension2D getSize() {
 		return new Dimension(w, h);
 	}
 
-	public final int getWidth() {
+	public int getWidth() {
 		return w;
 	}
 
-	public final int getHeight() {
+	public int getHeight() {
 		return h;
 	}
 
 	/** Clears all bits in the mask */
-	public final void clear() {
+	public void clear() {
 		Arrays.fill(bits, 0);
 	}
 
 	/** Sets all bits in the mask */
-	public final void fill() {
+	public void fill() {
 		final long len = sizeInLongs(w - 1, h);
 		final long shift = BITMASK_W_LEN - (w % BITMASK_W_LEN);
 		final long cmask = ALL_BITS_SET >>> shift;
@@ -100,12 +103,12 @@ public final class Bitmask implements Serializable {
 		}
 	}
 
-	private final long sizeInLongs(final int w, final int h) {
+	private long sizeInLongs(final int w, final int h) {
 		return h * (w / BITMASK_W_LEN);
 	}
 
 	/** Flips all bits in the mask */
-	public final void invert() {
+	public void invert() {
 		final long len = sizeInLongs(w - 1, h);
 		final long shift = BITMASK_W_LEN - (w % BITMASK_W_LEN);
 		final long cmask = ALL_BITS_SET >>> shift;
@@ -119,7 +122,7 @@ public final class Bitmask implements Serializable {
 	}
 
 	/** Counts the bits in the mask */
-	public final int count() {
+	public int countBits() {
 		int total = 0;
 		for (long pixel = 0; pixel < (h * ((w - 1) / BITMASK_W_LEN + 1)); pixel++) {
 			total += Long.bitCount(bits[(int) pixel]);
@@ -131,43 +134,63 @@ public final class Bitmask implements Serializable {
 	/**
 	 * @return true if the bit at (x,y) is set. Coordinates start at (0,0)
 	 */
-	public final boolean getBit(final int x, final int y) {
+	public boolean getBit(final int x, final int y) {
 		return (bits[(int) (x / BITMASK_W_LEN * h + y)] & BITMASK_N[(int) (x & BITMASK_W_MASK)]) != 0;
 	}
 
 	/**
 	 * @see Bitmask#getBit(int, int)
 	 */
-	public final boolean getBit(final Point2D point) {
+	public boolean getBit(final Point2D point) {
 		return getBit((int) point.getX(), (int) point.getY());
 	}
 
 	/**
 	 * Sets the bit at (x,y)
 	 */
-	public final void setBit(final int x, final int y) {
+	public void setBit(final int x, final int y) {
 		bits[(int) (x / BITMASK_W_LEN * h + y)] |= BITMASK_N[(int) (x & BITMASK_W_MASK)];
 	}
 
 	/**
 	 * @see Bitmask#setBit(int, int)
 	 */
-	public final void setBit(final Point2D point) {
+	public void setBit(final Point2D point) {
 		setBit((int) point.getX(), (int) point.getY());
 	}
 
 	/**
 	 * Clears the bit at (x,y)
 	 */
-	public final void clearBit(final int x, final int y) {
+	public void clearBit(final int x, final int y) {
 		bits[(int) (x / BITMASK_W_LEN * h + y)] &= ~BITMASK_N[(int) (x & BITMASK_W_MASK)];
 	}
 
 	/**
 	 * @see Bitmask#clearBit(int, int)
 	 */
-	public final void clearBit(final Point2D point) {
+	public void clearBit(final Point2D point) {
 		clearBit((int) point.getX(), (int) point.getY());
+	}
+
+	/**
+	 * A crude bounding rectangle overlap check. All other overlap methods have
+	 * a call to this built in.
+	 * 
+	 * @param b
+	 *            another bitmask.
+	 * @param xOffset
+	 *            relative position of bitmask b.
+	 * @param yOffset
+	 *            relative position of bitmask b.
+	 * @return whether the bitmask bounding rectangles overlap.
+	 */
+	public boolean overlapsBoundingRectangleOf(final Bitmask b, final int xOffset, final int yOffset) {
+		return !(xOffset >= w || yOffset >= h || b.h + yOffset <= 0 || b.w + xOffset <= 0);
+	}
+
+	public boolean overlapsBoundingRectangleOf(final Bitmask b, final Point2D offset) {
+		return overlapsBoundingRectangleOf(b, (int) offset.getX(), (int) offset.getY());
 	}
 
 	/**
@@ -184,11 +207,10 @@ public final class Bitmask implements Serializable {
 	 * :  :
 	 * </pre>
 	 */
-	public final boolean overlap(Bitmask b, int xoffset, int yoffset) {
+	public final boolean overlaps(Bitmask b, int xoffset, int yoffset) {
 		Bitmask a = this;
 
-		if (xoffset >= a.w || yoffset >= a.h || b.h + yoffset <= 0 || b.w + xoffset <= 0) {
-			// Bitmask rectangles do not overlap.
+		if (!overlapsBoundingRectangleOf(b, xoffset, yoffset)) {
 			return false;
 		}
 
@@ -272,10 +294,10 @@ public final class Bitmask implements Serializable {
 	}
 
 	/**
-	 * @see Bitmask#overlap(Bitmask, int, int)
+	 * @see Bitmask#overlaps(Bitmask, int, int)
 	 */
-	public final boolean overlap(final Bitmask b, final Point2D point) {
-		return overlap(b, (int) point.getX(), (int) point.getY());
+	public final boolean overlaps(final Bitmask b, final Point2D offset) {
+		return overlaps(b, (int) offset.getX(), (int) offset.getY());
 	}
 
 	/**
@@ -657,353 +679,16 @@ public final class Bitmask implements Serializable {
 	//	}
 
 	/**
-	 * Draws mask b onto mask a (bitwise OR). Can be used to compose large (game
-	 * background?) mask from several submasks, which may speed up the testing.
+	 * @return a copy of this bitmask. It uses the copy constructor.
 	 */
-	//	public final void draw(final Bitmask b, final int xoffset, final int yoffset) {
-	//	  long *a_entry,*a_end, *ap;
-	//	  const long *b_entry, *b_end, *bp;
-	//	  int shift,rshift,i,astripes,bstripes;
-	//	  
-	//	  if ((xoffset >= a->w) || (yoffset >= a->h) || (yoffset <= - b->h)) 
-	//	      return;
-	//	  
-	//	  if (xoffset >= 0) 
-	//	    {
-	//	      if (yoffset >= 0)
-	//		{
-	//		  a_entry = a->bits + a->h*(xoffset/Bitmask_W_LEN) + yoffset;
-	//		  a_end = a_entry + MIN(b->h,a->h - yoffset);
-	//		  b_entry = b->bits;
-	//		}
-	//	      else
-	//		{
-	//		  a_entry = a->bits + a->h*(xoffset/Bitmask_W_LEN);
-	//		  a_end = a_entry + MIN(b->h + yoffset,a->h);
-	//		  b_entry = b->bits - yoffset;
-	//		}
-	//	      shift = xoffset & Bitmask_W_MASK;
-	//	      if (shift)
-	//		{
-	//		  rshift = Bitmask_W_LEN - shift;
-	//		  astripes = (a->w - 1)/Bitmask_W_LEN - xoffset/Bitmask_W_LEN;
-	//		  bstripes = (b->w - 1)/Bitmask_W_LEN + 1;
-	//		  if (bstripes > astripes) /* zig-zag .. zig*/
-	//		    {
-	//		      for (i=0;i<astripes;i++)
-	//			{
-	//			  for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			    *ap |= (*bp << shift);
-	//			  a_entry += a->h;
-	//			  a_end += a->h;
-	//			  for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			    *ap |= (*bp >> rshift);
-	//			  b_entry += b->h;
-	//			}
-	//		      for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			*ap |= (*bp << shift);
-	//		    }
-	//		  else /* zig-zag */
-	//		    {
-	//		      for (i=0;i<bstripes;i++)
-	//			{
-	//			  for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			    *ap |= (*bp << shift);
-	//			  a_entry += a->h;
-	//			  a_end += a->h;
-	//			  for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			    *ap |= (*bp >> rshift);
-	//			  b_entry += b->h;
-	//			}
-	//		    }
-	//		}
-	//	      else /* xoffset is a multiple of the stripe width, 
-	//		      and the above routines won't work. */
-	//		{
-	//		  astripes = (MIN(b->w,a->w - xoffset) - 1)/Bitmask_W_LEN + 1;
-	//		  for (i=0;i<astripes;i++)
-	//		    {
-	//		      for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			{
-	//			  *ap |= *bp;
-	//			}
-	//		      a_entry += a->h;
-	//		      a_end += a->h;
-	//		      b_entry += b->h;
-	//		    }
-	//		}
-	//	    }
-	//	  else  
-	//	    {
-	//	      xoffset *= -1;
-	//	      yoffset *= -1;
-	//
-	//	      if (yoffset >= 0)
-	//		{
-	//		  b_entry = b->bits + b->h*(xoffset/Bitmask_W_LEN) + yoffset;
-	//		  b_end = b_entry + MIN(a->h,b->h - yoffset);
-	//		  a_entry = a->bits;
-	//		}
-	//	      else
-	//		{
-	//		  b_entry = b->bits + b->h*(xoffset/Bitmask_W_LEN);
-	//		  b_end = b_entry + MIN(a->h + yoffset,b->h);
-	//		  a_entry = a->bits - yoffset;
-	//		}
-	//	      shift = xoffset & Bitmask_W_MASK;
-	//	      if (shift)
-	//		{
-	//		  rshift = Bitmask_W_LEN - shift;
-	//		  astripes = (b->w - 1)/Bitmask_W_LEN - xoffset/Bitmask_W_LEN;
-	//		  bstripes = (a->w - 1)/Bitmask_W_LEN + 1;
-	//		  if (bstripes > astripes) /* zig-zag .. zig*/
-	//		    {
-	//		      for (i=0;i<astripes;i++)
-	//			{
-	//			  for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			    *ap |= (*bp >> shift);
-	//			  b_entry += b->h;
-	//			  b_end += b->h;
-	//			  for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			    *ap |= (*bp <<rshift); 
-	//			  a_entry += a->h;
-	//			}
-	//		      for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			*ap |= (*bp >> shift);
-	//		    }
-	//		  else /* zig-zag */
-	//		    {
-	//		      for (i=0;i<bstripes;i++)
-	//			{
-	//			  for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			    *ap |= (*bp >> shift);
-	//			  b_entry += b->h;
-	//			  b_end += b->h;
-	//			  for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			    *ap |= (*bp << rshift);
-	//			  a_entry += a->h;
-	//			}
-	//		    }
-	//		}
-	//	      else /* xoffset is a multiple of the stripe width, and the above routines won't work. */
-	//		{
-	//		  astripes = (MIN(a->w,b->w - xoffset) - 1)/Bitmask_W_LEN + 1;
-	//		  for (i=0;i<astripes;i++)
-	//		    {
-	//		      for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			{
-	//			  *ap |= *bp;
-	//			}
-	//		      b_entry += b->h;
-	//		      b_end += b->h;
-	//		      a_entry += a->h;
-	//		    }
-	//		}
-	//	      xoffset *= -1;
-	//	      yoffset *= -1;
-	//	    }	
-	//	  /* Zero out bits outside the mask rectangle (to the right), if there
-	//	   is a chance we were drawing there. */
-	//	  if (xoffset + b->w > a->w)
-	//	    {
-	//	      long edgemask;
-	//	      int n = a->w/Bitmask_W_LEN;
-	//	      shift = (n + 1)*Bitmask_W_LEN - a->w;
-	//	      edgemask = (~(long)0) >> shift;
-	//	      a_end = a->bits + n*a->h + MIN(a->h,b->h + yoffset);
-	//	      for (ap = a->bits + n*a->h + MAX(yoffset,0);ap<a_end;ap++)
-	//		*ap &= edgemask;
-	//	    }
-	//	}
-
-	//	public final void erase(final Bitmask b, final int xoffset, final int yoffset) {
-	//	  long *a_entry,*a_end, *ap;
-	//	  const long *b_entry, *b_end, *bp;
-	//	  int shift,rshift,i,astripes,bstripes;
-	//	  
-	//	  if ((xoffset >= a->w) || (yoffset >= a->h) || (yoffset <= - b->h)) 
-	//	      return;
-	//	  
-	//	  if (xoffset >= 0) 
-	//	    {
-	//	      if (yoffset >= 0)
-	//		{
-	//		  a_entry = a->bits + a->h*(xoffset/Bitmask_W_LEN) + yoffset;
-	//		  a_end = a_entry + MIN(b->h,a->h - yoffset);
-	//		  b_entry = b->bits;
-	//		}
-	//	      else
-	//		{
-	//		  a_entry = a->bits + a->h*(xoffset/Bitmask_W_LEN);
-	//		  a_end = a_entry + MIN(b->h + yoffset,a->h);
-	//		  b_entry = b->bits - yoffset;
-	//		}
-	//	      shift = xoffset & Bitmask_W_MASK;
-	//	      if (shift)
-	//		{
-	//		  rshift = Bitmask_W_LEN - shift;
-	//		  astripes = (a->w - 1)/Bitmask_W_LEN - xoffset/Bitmask_W_LEN;
-	//		  bstripes = (b->w - 1)/Bitmask_W_LEN + 1;
-	//		  if (bstripes > astripes) /* zig-zag .. zig*/
-	//		    {
-	//		      for (i=0;i<astripes;i++)
-	//			{
-	//			  for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			    *ap &= ~(*bp << shift);
-	//			  a_entry += a->h;
-	//			  a_end += a->h;
-	//			  for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			    *ap &= ~(*bp >> rshift);
-	//			  b_entry += b->h;
-	//			}
-	//		      for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			*ap &= ~(*bp << shift);
-	//		    }
-	//		  else /* zig-zag */
-	//		    {
-	//		      for (i=0;i<bstripes;i++)
-	//			{
-	//			  for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			    *ap &= ~(*bp << shift);
-	//			  a_entry += a->h;
-	//			  a_end += a->h;
-	//			  for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			    *ap &= ~(*bp >> rshift);
-	//			  b_entry += b->h;
-	//			}
-	//		    }
-	//		}
-	//	      else /* xoffset is a multiple of the stripe width, 
-	//		      and the above routines won't work. */
-	//		{
-	//		  astripes = (MIN(b->w,a->w - xoffset) - 1)/Bitmask_W_LEN + 1;
-	//		  for (i=0;i<astripes;i++)
-	//		    {
-	//		      for (ap = a_entry,bp = b_entry;ap < a_end;ap++,bp++)
-	//			{
-	//			  *ap &= ~*bp;
-	//			}
-	//		      a_entry += a->h;
-	//		      a_end += a->h;
-	//		      b_entry += b->h;
-	//		    }
-	//		}
-	//	    }
-	//	  else  
-	//	    {
-	//	      xoffset *= -1;
-	//	      yoffset *= -1;
-	//
-	//	      if (yoffset >= 0)
-	//		{
-	//		  b_entry = b->bits + b->h*(xoffset/Bitmask_W_LEN) + yoffset;
-	//		  b_end = b_entry + MIN(a->h,b->h - yoffset);
-	//		  a_entry = a->bits;
-	//		}
-	//	      else
-	//		{
-	//		  b_entry = b->bits + b->h*(xoffset/Bitmask_W_LEN);
-	//		  b_end = b_entry + MIN(a->h + yoffset,b->h);
-	//		  a_entry = a->bits - yoffset;
-	//		}
-	//	      shift = xoffset & Bitmask_W_MASK;
-	//	      if (shift)
-	//		{
-	//		  rshift = Bitmask_W_LEN - shift;
-	//		  astripes = (b->w - 1)/Bitmask_W_LEN - xoffset/Bitmask_W_LEN;
-	//		  bstripes = (a->w - 1)/Bitmask_W_LEN + 1;
-	//		  if (bstripes > astripes) /* zig-zag .. zig*/
-	//		    {
-	//		      for (i=0;i<astripes;i++)
-	//			{
-	//			  for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			    *ap &= ~(*bp >> shift);
-	//			  b_entry += b->h;
-	//			  b_end += b->h;
-	//			  for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			    *ap &= ~(*bp <<rshift); 
-	//			  a_entry += a->h;
-	//			}
-	//		      for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			*ap |= (*bp >> shift);
-	//		    }
-	//		  else /* zig-zag */
-	//		    {
-	//		      for (i=0;i<bstripes;i++)
-	//			{
-	//			  for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			    *ap &= ~(*bp >> shift);
-	//			  b_entry += b->h;
-	//			  b_end += b->h;
-	//			  for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			    *ap &= ~(*bp << rshift);
-	//			  a_entry += a->h;
-	//			}
-	//		    }
-	//		}
-	//	      else /* xoffset is a multiple of the stripe width, and the above routines won't work. */
-	//		{
-	//		  astripes = (MIN(a->w,b->w - xoffset) - 1)/Bitmask_W_LEN + 1;
-	//		  for (i=0;i<astripes;i++)
-	//		    {
-	//		      for (bp = b_entry,ap = a_entry;bp < b_end;bp++,ap++)
-	//			*ap &= ~*bp;
-	//		      b_entry += b->h;
-	//		      b_end += b->h;
-	//		      a_entry += a->h;
-	//		    }
-	//		}
-	//	    }	
-	//	}
-
-	/**
-	 * Return a new scaled Bitmask, with dimensions w*h. The quality of the
-	 * scaling may not be perfect for all circumstances, but it should be
-	 * reasonable. If either w or h is 0 a clear 1x1 mask is returned.
-	 */
-	public final Bitmask scale(final int scaledWidth, final int scaledHeight) {
-		if (scaledWidth < 1 || scaledHeight < 1) {
-			return new Bitmask(1, 1);
-		}
-		final Bitmask nm = new Bitmask(scaledWidth, scaledHeight);
-		final double xFactor = (double) w / scaledWidth;
-		final double yFactor = (double) h / scaledHeight;
-		for (int x = 0; x < scaledWidth; x++) {
-			for (int y = 0; y < scaledHeight; y++) {
-				if (getBit((int) ((x + 0.5) * xFactor), (int) ((y + 0.5) * yFactor))) {
-					nm.setBit(x, y);
-				}
-			}
-		}
-		return nm;
+	public Object clone() {
+		return new Bitmask(this);
 	}
-
-	/**
-	 * Convolve b into a, drawing the output into o, shifted by offset. If
-	 * offset is 0, then the (x,y) bit will be set if and only if
-	 * Bitmask_overlap(a, b, x - b->w - 1, y - b->h - 1) returns true.
-	 * 
-	 * <pre>
-	 * Modifies bits o[xoffset ... xoffset + a->w + b->w - 1)
-	 *                  [yoffset ... yoffset + a->h + b->h - 1).
-	 * </pre>
-	 */
-	//	public final void convolve(final Bitmask b, final Bitmask o, final int xoffset, final int yoffset) {
-	//		xoffset += b.w - 1;
-	//		yoffset += b.h - 1;
-	//		for (int y = 0; y < b.h; y++) {
-	//			for (int x = 0; x < b.w; x++) {
-	//				if (b.getBit(x, y)) {
-	//					o.draw(this, xoffset - x, yoffset - y);
-	//				}
-	//			}
-	//		}
-	//	}
 
 	/**
 	 * @return an ASCII art representation of the content of this Bitmask.
 	 */
-	public final String toString() {
+	public String toString() {
 		final StringBuffer dump = new StringBuffer();
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
@@ -1012,5 +697,31 @@ public final class Bitmask implements Serializable {
 			dump.append("\n");
 		}
 		return dump.toString();
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public boolean equals(final Object obj) {
+		if (!(obj instanceof Bitmask)) {
+			return false;
+		}
+		final Bitmask otherBitmask = (Bitmask) obj;
+		if (w != otherBitmask.w || h != otherBitmask.h) {
+			return false;
+		}
+		for (int i = 0; i < bits.length; i++) {
+			if (bits[i] != otherBitmask.bits[i]) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public int hashCode() {
+		return w << 256 + 17 * h;
 	}
 }

@@ -1,0 +1,24 @@
+<body>
+
+<h1>Bitmask collision detection library</h1>
+
+<p>This library will give 2D graphics developers, especially game
+developers, a tool to quickly detect whether two images overlap by
+comparing their actual visible pixels. This is done by creating an extra
+datastructure for every image, the Bitmask. It contains the pattern of
+visible pixels of the image as a pattern of bits. Overlaps can be found
+very quickly by simply AND-ing two of these bitmasks, supplying an
+offset.</p>
+
+<p>This library was originally written by Ulf Ekström. The Java port
+is by Danny van Bruggen. It is ported from the code found in <a
+	href="http://www.pygame.org/news.html">Pygame</a></p>
+
+<p>Technical background: <a
+	href="http://imrtechnology.ngemu.com/downloads/tutorial.pdf">A 2d
+collision detection tutorial, including a C implementation.</a></p>
+
+<p>Note that for now, only one collision detection method has been
+ported, but this happens to be the most essential one.</p>
+
+</body>

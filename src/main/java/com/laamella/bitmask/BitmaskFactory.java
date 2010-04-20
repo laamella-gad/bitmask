@@ -7,7 +7,8 @@ import java.awt.image.ColorModel;
 import java.awt.image.Raster;
 
 /**
- * Factory for creating bitmasks in all kinds of ways.
+ * Factory for creating bitmasks in all kinds of ways that do not involve
+ * another Bitmask.
  */
 public final class BitmaskFactory {
 	private BitmaskFactory() {
@@ -49,6 +50,8 @@ public final class BitmaskFactory {
 	 *            a value in the range of 0..1, the higher it is, the bigger the
 	 *            range of alpha values that is considered transparent.
 	 * @return a new bitmask for the source image.
+	 * @throws IllegalArgumentException
+	 *             when the image has no alpha channel.
 	 */
 	public static Bitmask createBitmaskFromAlphaChannel(final BufferedImage image, final double threshold) {
 		final int intThreshold = (int) (threshold * 255);
