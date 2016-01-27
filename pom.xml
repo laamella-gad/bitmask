@@ -5,11 +5,11 @@
 	<groupId>com.laamella</groupId>
 	<artifactId>bitmask</artifactId>
 	<version>1.7-SNAPSHOT</version>
-	<packaging>jar</packaging>
-	
-	<name>Bitmask</name>
+
+	<name>${project.groupId}:${project.artifactId}</name>
 	<description>2D pixel perfect collision detection library</description>
-	
+	<url>https://github.com/laamella-gad/bitmask</url>
+
 	<developers>
 		<developer>
 			<name>Ulf Ekström</name>
@@ -36,6 +36,7 @@
 			<groupId>junit-addons</groupId>
 			<artifactId>junit-addons</artifactId>
 			<version>1.4</version>
+			<scope>test</scope>
 			<exclusions>
 				<exclusion>
 					<groupId>xerces</groupId>
@@ -54,4 +55,18 @@
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
+
+	<scm>
+		<connection>scm:git:git@github.com:laamella-gad/bitmask.git</connection>
+		<developerConnection>scm:git:git@github.com:laamella-gad/bitmask.git</developerConnection>
+		<url>https://github.com/laamella-gad/bitmask.git</url>
+	</scm>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 </project>
