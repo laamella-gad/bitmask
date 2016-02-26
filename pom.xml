@@ -1,80 +1,80 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.laamella</groupId>
-	<artifactId>bitmask</artifactId>
-	<version>1.7-SNAPSHOT</version>
+    <groupId>com.laamella</groupId>
+    <artifactId>bitmask</artifactId>
+    <version>1.7-SNAPSHOT</version>
 
-	<name>${project.groupId}:${project.artifactId}</name>
-	<description>2D pixel perfect collision detection library</description>
-	<url>https://github.com/laamella-gad/bitmask</url>
+    <name>${project.groupId}:${project.artifactId}</name>
+    <description>2D pixel perfect collision detection library</description>
+    <url>https://github.com/laamella-gad/bitmask</url>
 
-	<developers>
-		<developer>
-			<name>Ulf Ekström</name>
-			<roles>
-				<role>Creator of the original C version</role>
-			</roles>
-		</developer>
-		<developer>
-			<name>Danny van Bruggen</name>
-			<roles>
-				<role>Java port</role>
-			</roles>
-		</developer>
-	</developers>
-	
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>4.8.1</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>junit-addons</groupId>
-			<artifactId>junit-addons</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>xerces</groupId>
-					<artifactId>xercesImpl</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>xerces</groupId>
-					<artifactId>xmlParserAPIs</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>commons-io</groupId>
-			<artifactId>commons-io</artifactId>
-			<version>1.4</version>
-			<scope>test</scope>
-		</dependency>
-	</dependencies>
+    <developers>
+        <developer>
+            <name>Ulf Ekström</name>
+            <roles>
+                <role>Creator of the original C version</role>
+            </roles>
+        </developer>
+        <developer>
+            <name>Danny van Bruggen</name>
+            <roles>
+                <role>Java port</role>
+            </roles>
+        </developer>
+    </developers>
 
-	<distributionManagement>
-		<repository>
-			<id>bintray-laamella-gad-com.laamella</id>
-			<name>laamella-gad-com.laamella</name>
-			<url>https://api.bintray.com/maven/laamella-gad/com.laamella/bitmask/;publish=1</url>
-		</repository>
-	</distributionManagement>
+    <dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit-addons</groupId>
+            <artifactId>junit-addons</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xercesImpl</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>xerces</groupId>
+                    <artifactId>xmlParserAPIs</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>1.4</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
-	<scm>
-		<connection>scm:git:git@github.com:laamella-gad/bitmask.git</connection>
-		<developerConnection>scm:git:git@github.com:laamella-gad/bitmask.git</developerConnection>
-		<url>https://github.com/laamella-gad/bitmask.git</url>
-	</scm>
+    <distributionManagement>
+        <repository>
+            <id>bintray-laamella-gad-com.laamella</id>
+            <name>laamella-gad-com.laamella</name>
+            <url>https://api.bintray.com/maven/laamella-gad/com.laamella/bitmask/</url>
+        </repository>
+    </distributionManagement>
 
-	<licenses>
-		<license>
-			<name>The Apache Software License, Version 2.0</name>
-			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
+    <scm>
+        <connection>scm:git:git@github.com:laamella-gad/bitmask.git</connection>
+        <developerConnection>scm:git:git@github.com:laamella-gad/bitmask.git</developerConnection>
+        <url>https://github.com/laamella-gad/bitmask.git</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
 </project>
