@@ -56,12 +56,14 @@
 		</dependency>
 	</dependencies>
 
-	<scm>
-		<connection>scm:git:git@github.com:laamella-gad/bitmask.git</connection>
-		<developerConnection>scm:git:git@github.com:laamella-gad/bitmask.git</developerConnection>
-		<url>https://github.com/laamella-gad/bitmask.git</url>
-	</scm>
-
+	<distributionManagement>
+		<repository>
+			<id>bintray-laamella-gad-com.laamella</id>
+			<name>laamella-gad-com.laamella</name>
+			<url>https://api.bintray.com/maven/laamella-gad/com.laamella/bitmask/;publish=1</url>
+		</repository>
+	</distributionManagement>
+	
 	<licenses>
 		<license>
 			<name>The Apache Software License, Version 2.0</name>
