@@ -20,9 +20,6 @@
  */
 package com.laamella.bitmask;
 
-import java.awt.Dimension;
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
 import java.io.Serializable;
 import java.util.Arrays;
 
@@ -49,7 +46,7 @@ public final class Bitmask implements Serializable {
 			0x2000000000000L, 0x4000000000000L, 0x8000000000000L, 0x10000000000000L, 0x20000000000000L,
 			0x40000000000000L, 0x80000000000000L, 0x100000000000000L, 0x200000000000000L, 0x400000000000000L,
 			0x800000000000000L, 0x1000000000000000L, 0x2000000000000000L, 0x4000000000000000L, 0x8000000000000000L };
-	private static final long ALL_BITS_SET = ~0l;
+	private static final long ALL_BITS_SET = ~0L;
 
 	private final int w, h;
 	// Storage is column by column.
@@ -70,10 +67,6 @@ public final class Bitmask implements Serializable {
 		this.w = bitmask.w;
 		this.h = bitmask.h;
 		this.bits = Arrays.copyOf(bitmask.bits, bitmask.bits.length);
-	}
-
-	public Dimension2D getSize() {
-		return new Dimension(w, h);
 	}
 
 	public int getWidth() {
@@ -137,14 +130,7 @@ public final class Bitmask implements Serializable {
 	public boolean getBit(final int x, final int y) {
 		return (bits[(int) (x / BITMASK_W_LEN * h + y)] & BITMASK_N[(int) (x & BITMASK_W_MASK)]) != 0;
 	}
-
-	/**
-	 * @see Bitmask#getBit(int, int)
-	 */
-	public boolean getBit(final Point2D point) {
-		return getBit((int) point.getX(), (int) point.getY());
-	}
-
+	
 	/**
 	 * Sets the bit at (x,y)
 	 */
@@ -153,24 +139,10 @@ public final class Bitmask implements Serializable {
 	}
 
 	/**
-	 * @see Bitmask#setBit(int, int)
-	 */
-	public void setBit(final Point2D point) {
-		setBit((int) point.getX(), (int) point.getY());
-	}
-
-	/**
 	 * Clears the bit at (x,y)
 	 */
 	public void clearBit(final int x, final int y) {
 		bits[(int) (x / BITMASK_W_LEN * h + y)] &= ~BITMASK_N[(int) (x & BITMASK_W_MASK)];
-	}
-
-	/**
-	 * @see Bitmask#clearBit(int, int)
-	 */
-	public void clearBit(final Point2D point) {
-		clearBit((int) point.getX(), (int) point.getY());
 	}
 
 	/**
@@ -187,10 +159,6 @@ public final class Bitmask implements Serializable {
 	 */
 	public boolean overlapsBoundingRectangleOf(final Bitmask b, final int xOffset, final int yOffset) {
 		return !(xOffset >= w || yOffset >= h || b.h + yOffset <= 0 || b.w + xOffset <= 0);
-	}
-
-	public boolean overlapsBoundingRectangleOf(final Bitmask b, final Point2D offset) {
-		return overlapsBoundingRectangleOf(b, (int) offset.getX(), (int) offset.getY());
 	}
 
 	/**
@@ -293,14 +261,7 @@ public final class Bitmask implements Serializable {
 		}
 	}
 
-	/**
-	 * @see Bitmask#overlaps(Bitmask, int, int)
-	 */
-	public final boolean overlaps(final Bitmask b, final Point2D offset) {
-		return overlaps(b, (int) offset.getX(), (int) offset.getY());
-	}
-
-	/**
+	/*
 	 * Like Bitmask_overlap(), but will also give a point of intersection. x and
 	 * y are given in the coordinates of mask a, and are untouched if there is
 	 * no overlap.
@@ -689,7 +650,7 @@ public final class Bitmask implements Serializable {
 	 * @return an ASCII art representation of the content of this Bitmask.
 	 */
 	public String toString() {
-		final StringBuffer dump = new StringBuffer();
+		final StringBuilder dump = new StringBuilder();
 		for (int y = 0; y < h; y++) {
 			for (int x = 0; x < w; x++) {
 				dump.append(getBit(x, y) ? 'o' : '.');

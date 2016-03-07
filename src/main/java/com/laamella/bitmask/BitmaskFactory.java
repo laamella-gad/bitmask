@@ -1,7 +1,6 @@
 package com.laamella.bitmask;
 
 import java.awt.Color;
-import java.awt.geom.Dimension2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.Raster;
@@ -27,17 +26,6 @@ public final class BitmaskFactory {
 	 */
 	public static Bitmask createEmptyBitmask(final int width, final int height) {
 		return new Bitmask(width, height);
-	}
-
-	/**
-	 * Create an empty bitmask.
-	 * 
-	 * @param size
-	 *            the size of the new bitmask.
-	 * @return a new, empty bitmask.
-	 */
-	public static Bitmask createEmptyBitmask(final Dimension2D size) {
-		return new Bitmask((int) Math.ceil(size.getWidth()), (int) Math.ceil(size.getHeight()));
 	}
 
 	/**

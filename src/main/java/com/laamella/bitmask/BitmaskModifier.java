@@ -1,8 +1,5 @@
 package com.laamella.bitmask;
 
-import java.awt.geom.Dimension2D;
-import java.awt.geom.Point2D;
-
 /**
  * Various drawing tools that were separated from Bitmask to prevent bloat.
  */
@@ -14,17 +11,7 @@ public final class BitmaskModifier {
 	private static final int AND = 0;
 	private static final int ERASE = 1;
 
-	/**
-	 * Apply some function to the bits in a with the bits in b that overlap them
-	 * using an offset.
-	 * 
-	 * @param b
-	 * @param xOffset
-	 * @param yOffset
-	 * @param operation
-	 */
-	private static final void apply(final Bitmask a, final Bitmask b, final int xOffset, final int yOffset,
-			final int operation) {
+	private static void apply(final Bitmask a, final Bitmask b, final int xOffset, final int yOffset, final int operation) {
 		if (!a.overlapsBoundingRectangleOf(b, xOffset, yOffset)) {
 			return;
 		}
@@ -72,32 +59,16 @@ public final class BitmaskModifier {
 	/**
 	 * Draws mask b onto mask a (bitwise OR). Can be used to compose large (game
 	 * background?) mask from several submasks, which may speed up the testing.
-	 * 
-	 * @param bitmaskModifier
 	 */
-	public final static void draw(final Bitmask a, final Bitmask b, final int xOffset, final int yOffset) {
+	public static void draw(final Bitmask a, final Bitmask b, final int xOffset, final int yOffset) {
 		apply(a, b, xOffset, yOffset, AND);
-	}
-
-	/**
-	 * @see Bitmask#draw(Bitmask, int, int)
-	 */
-	public final static void draw(final Bitmask a, final Bitmask b, final Point2D offset) {
-		draw(a, b, (int) offset.getX(), (int) offset.getY());
 	}
 
 	/**
 	 * Erase any set bits on this bitmask that are set in bitmask b.
 	 */
-	public final static void erase(final Bitmask a, final Bitmask b, final int xOffset, final int yOffset) {
+	public static void erase(final Bitmask a, final Bitmask b, final int xOffset, final int yOffset) {
 		apply(a, b, xOffset, yOffset, ERASE);
-	}
-
-	/**
-	 * @see Bitmask#erase(Bitmask, int, int)
-	 */
-	public final static void erase(final Bitmask a, final Bitmask b, final Point2D offset) {
-		erase(a, b, (int) offset.getX(), (int) offset.getY());
 	}
 
 	/**
@@ -105,7 +76,7 @@ public final class BitmaskModifier {
 	 * no attempt at smoothing the result. If either w or h is less than one, a
 	 * clear 1x1 mask is returned.
 	 */
-	public final static Bitmask scale(final Bitmask source, final int scaledWidth, final int scaledHeight) {
+	public static Bitmask scale(final Bitmask source, final int scaledWidth, final int scaledHeight) {
 		if (scaledWidth < 1 || scaledHeight < 1) {
 			return new Bitmask(1, 1);
 		}
@@ -120,13 +91,6 @@ public final class BitmaskModifier {
 			}
 		}
 		return newMask;
-	}
-
-	/**
-	 * @see Bitmask#scale(int, int)
-	 */
-	public static Bitmask scale(final Bitmask source, final Dimension2D size) {
-		return scale(source, (int) size.getWidth(), (int) size.getHeight());
 	}
 
 	/**
@@ -151,12 +115,4 @@ public final class BitmaskModifier {
 			}
 		}
 	}
-
-	/**
-	 * @see Bitmask#convolve(Bitmask, Bitmask, int, int)
-	 */
-	public static void convolve(final Bitmask a, final Bitmask b, final Bitmask o, final Point2D offset) {
-		convolve(a, b, o, (int) offset.getX(), (int) offset.getY());
-	}
-
 }
