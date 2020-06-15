@@ -36,17 +36,11 @@ public final class BitmaskModifier {
 			for (int y = top; y < bottom; y++) {
 				final boolean aBit = a.getBit(x, y);
 				final boolean bBit = b.getBit(x - xOffset, y - yOffset);
-				boolean resultBit;
-				switch (operation) {
-				case AND:
-					resultBit = aBit | bBit;
-					break;
-				case ERASE:
-					resultBit = aBit ^ bBit;
-					break;
-				default:
-					throw new IllegalArgumentException("Don't know operation " + operation);
-				}
+				boolean resultBit = switch (operation) {
+					case AND -> aBit | bBit;
+					case ERASE -> aBit ^ bBit;
+					default -> throw new IllegalArgumentException("Don't know operation " + operation);
+				};
 				if (resultBit) {
 					a.setBit(x, y);
 				} else {

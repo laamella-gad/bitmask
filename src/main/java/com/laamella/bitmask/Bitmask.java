@@ -37,7 +37,7 @@ import java.util.Arrays;
 public final class Bitmask implements Serializable {
 	private static final long BITMASK_W_LEN = Long.SIZE;
 	private static final long BITMASK_W_MASK = BITMASK_W_LEN - 1;
-	private static final long BITMASK_N[] = { 0x1L, 0x2L, 0x4L, 0x8L, 0x10L, 0x20L, 0x40L, 0x80L, 0x100L, 0x200L,
+	private static final long[] BITMASK_N = { 0x1L, 0x2L, 0x4L, 0x8L, 0x10L, 0x20L, 0x40L, 0x80L, 0x100L, 0x200L,
 			0x400L, 0x800L, 0x1000L, 0x2000L, 0x4000L, 0x8000L, 0x10000L, 0x20000L, 0x40000L, 0x80000L, 0x100000L,
 			0x200000L, 0x400000L, 0x800000L, 0x1000000L, 0x2000000L, 0x4000000L, 0x8000000L, 0x10000000L, 0x20000000L,
 			0x40000000L, 0x80000000L, 0x100000000L, 0x200000000L, 0x400000000L, 0x800000000L, 0x1000000000L,
@@ -50,7 +50,7 @@ public final class Bitmask implements Serializable {
 
 	private final int w, h;
 	// Storage is column by column.
-	private final long bits[];
+	private final long[] bits;
 
 	/**
 	 * Creates a Bitmask of width w and height h, where w and h must both be
