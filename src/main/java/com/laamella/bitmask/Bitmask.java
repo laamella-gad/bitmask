@@ -175,7 +175,7 @@ public final class Bitmask implements Serializable {
 	 * :  :
 	 * </pre>
 	 */
-	public final boolean overlaps(Bitmask b, int xoffset, int yoffset) {
+	public boolean overlaps(Bitmask b, int xoffset, int yoffset) {
 		Bitmask a = this;
 
 		if (!overlapsBoundingRectangleOf(b, xoffset, yoffset)) {

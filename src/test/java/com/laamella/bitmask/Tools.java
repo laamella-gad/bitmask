@@ -1,30 +1,19 @@
 package com.laamella.bitmask;
 
-import org.apache.commons.io.FileUtils;
 import org.opentest4j.AssertionFailedError;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
-
-import static java.nio.charset.StandardCharsets.UTF_8;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 class Tools {
     static String readStringResource(final String resourceName) {
         try {
-            return FileUtils.readFileToString(new File(resourceName.getClass().getResource(resourceName).getFile()), UTF_8);
+            return Files.readString(Path.of(resourceName.getClass().getResource(resourceName).getFile()));
         } catch (final IOException e) {
             throw new AssertionFailedError(e.getMessage());
         }
-    }
-
-    static String dumpLongs(final Bitmask bitmask) {
-        final StringBuilder dump = new StringBuilder();
-        final long[] bits = getBits(bitmask);
-        for (int i = 0; i < bits.length; i++) {
-            dump.append(Long.toBinaryString(bits[i])).append("\n");
-        }
-        return dump.toString();
     }
 
     static Bitmask makeOnOffPatternBitmask(final int width, final int height) {

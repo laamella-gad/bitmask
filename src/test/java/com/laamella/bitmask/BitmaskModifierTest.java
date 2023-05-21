@@ -76,7 +76,7 @@ public class BitmaskModifierTest  {
 		final Bitmask expected = Tools.createBitmaskFromResource("/draw_at_0_0.txt");
 		BitmaskModifier.draw(bitmask1, scaled, -2, -2);
 		System.out.println(bitmask1);
-		//		assertEquals(expected, bitmask1);
+				assertEquals(expected, bitmask1);
 	}
 
 	@Test
@@ -87,6 +87,6 @@ public class BitmaskModifierTest  {
 		final Bitmask expected = Tools.createBitmaskFromResource("/draw_at_0_0.txt");
 		BitmaskModifier.erase(bitmask1, scaled, -2, -2);
 		System.out.println(bitmask1);
-		//		assertEquals(expected, bitmask1);
+				assertEquals(expected, bitmask1);
 	}
 }
