@@ -10,7 +10,7 @@ import java.nio.file.Path;
 class Tools {
     static String readStringResource(final String resourceName) {
         try {
-            return Files.readString(Path.of(resourceName.getClass().getResource(resourceName).getFile()));
+            return Files.readString(Path.of(Tools.class.getResource(resourceName).getFile()));
         } catch (final IOException e) {
             throw new AssertionFailedError(e.getMessage());
         }
